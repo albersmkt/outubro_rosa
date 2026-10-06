@@ -42,7 +42,7 @@ Para testar a API, execute `npm test`. `npm run dev` e `npm run preview` servem 
 
 Configure a TV em orientação vertical e abra o navegador em modo kiosk/tela cheia. A área útil mantém 9:16 (referência: 1080 × 1920), sem cortes e sem rolagem. Em telas com outra proporção, aparecem margens.
 
-Toque em “Toque na tela!” para começar e em “Clique aqui!” para avançar. “Voltar” retorna à tela anterior e “Início” reinicia. No encerramento, escolha **Tirar uma selfie** ou **Não, obrigado · Voltar ao início**. Setas do teclado navegam pelas telas educativas; Escape e Home retornam ao início, inclusive durante a selfie.
+Toque na seta **Começar** para iniciar e na seta **Próximo** para avançar. Esses botões ficam na lateral direita, centralizados na altura da tela, com área de toque de 14% da largura do totem. Na última pergunta, a seta indica **Concluir**. “Voltar” retorna à tela anterior e “Início” reinicia. No encerramento, escolha **Tirar uma selfie** ou **Não, obrigado · Voltar ao início**. Setas do teclado navegam pelas telas educativas; Escape e Home retornam ao início, inclusive durante a selfie.
 
 Após 90 segundos sem interação nas perguntas, a sessão retorna à abertura. O encerramento permanece por 20 segundos e também retorna à abertura. Os tempos estão em `src/main.js`. A câmera/confirmacão aguarda até 90 segundos; após gerar o QR Code, a tela retorna à abertura em **45 segundos**, com contador visível. Os tempos da selfie estão em `src/selfie.js`. A câmera é desligada após a captura, ao sair da selfie ou ao ocultar a aba. A foto local e sua URL temporária são descartadas ao reiniciar a sessão. A página de download no celular não reinicia automaticamente.
 

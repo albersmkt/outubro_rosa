@@ -16,13 +16,14 @@ body { display: grid; place-items: center; min-height: 100dvh; }
 button { font: inherit; color: inherit; background: transparent; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform 150ms cubic-bezier(.23,1,.32,1), background-color 150ms ease; }
 button:active { transform: scale(.97); }
 button:focus-visible, a:focus-visible { outline: .45cqw solid #67102e; outline-offset: .5cqw; }
-.start { position: absolute; left: 41%; top: 89.7%; width: 51%; height: 8%; border: 0; border-radius: 7cqw; }
-.question-copy { position: absolute; top: 37.5%; left: 5.4%; right: 5.4%; text-align: center; }
+.side-next { position: absolute; right: 3%; top: calc(50% - 7cqw); width: 14cqw; height: 14cqw; padding: 2.6cqw; border: .35cqw solid #ffe0ec; border-radius: 50%; background: #871439e8; box-shadow: 0 1cqw 3cqw #4b0c2433; display: grid; place-items: center; }
+.side-next svg { width: 100%; height: 100%; pointer-events: none; }
+.side-next-label { position: absolute; top: calc(100% + 1cqw); left: -1cqw; right: -1cqw; font-size: 2.5cqw; line-height: 1.3; text-align: center; text-shadow: 0 .2cqw 1cqw #51172f; pointer-events: none; }
+.question-copy { position: absolute; top: 35%; left: 5.4%; right: 22.5%; text-align: center; }
+.question-copy h1, .question-copy p { font-size: 5.1cqw; }
 h1, p { margin: 0; font-size: 5.7cqw; line-height: 1.42; font-weight: 400; text-wrap: pretty; }
 p { margin-top: 3.7cqw; }
 strong { font-weight: 700; }
-.next { position: absolute; left: 42.4%; top: 85.2%; width: 47%; height: 6.2%; border: .5cqw solid white; border-radius: 5cqw; font-size: 4.6cqw; }
-.hand { position: absolute; width: 8cqw; height: 8cqw; right: -2cqw; bottom: -2cqw; background: #e72460; border-radius: 40%; pointer-events: none; }
 nav { position: absolute; inset: auto 5.4% 2.3%; display: flex; align-items: center; justify-content: space-between; gap: 2cqw; }
 nav button { border: 0; padding: 2cqw 1cqw; min-height: 8.5cqw; font-size: 2.8cqw; }
 .progress { display: flex; gap: 1.7cqw; }
@@ -60,5 +61,5 @@ nav button { border: 0; padding: 2cqw 1cqw; min-height: 8.5cqw; font-size: 2.8cq
 .capture-count { display: grid; place-items: center; width: 23cqw; height: 23cqw; border-radius: 50%; border: .35cqw solid #fff9; background: #8f173ee6; font-size: 13cqw; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 .capture-instruction { font-size: 3cqw; padding: 1.5cqw 3cqw; border-radius: 5cqw; background: #51172fe6; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-@media (hover: hover) and (pointer: fine) { .next:hover, .restart:hover { background-color: #b7134380; } }
+@media (hover: hover) and (pointer: fine) { .side-next:hover, .restart:hover { background-color: #a91b48; } }
 @media (prefers-reduced-motion: reduce) { button, .depth-layer { transition: none; } button:active { transform: none; } }

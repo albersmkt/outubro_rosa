@@ -21,7 +21,7 @@ const reduceVideoMotion = matchMedia('(prefers-reduced-motion: reduce)');
 campaignVideo.muted = true;
 campaignVideo.defaultMuted = true;
 const depth = createDepthMotion(totem);
-const hand = '<svg class="hand" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="m24 33-10-14c-3-4-8 0-5 4l17 25-8-3c-6-2-8 4-3 7l16 9c3 2 6 2 9 0l16-11c3-2 3-6 1-9L45 23c-3-4-7-1-5 3l-3-5c-3-4-7-1-5 3l-3-4c-3-4-8-1-5 3l7 11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const nextArrow = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 let screen = 0;
 let timer;
 let closeSelfie;
@@ -60,12 +60,12 @@ function show(next, keyboard = false) {
   artwork.src = `/assets/${screen === 0 ? 'abertura-video.svg' : screen === 7 ? 'encerramento-video.svg' : 'perguntas.png'}`;
   syncCampaignVideo();
   if (screen === 0) {
-    content.innerHTML = '<h1 class="sr-only">Outubro Rosa. Se toca, mulher! Você conhece o Outubro Rosa?</h1><button class="start" data-action="next" aria-label="Toque na tela para começar"><span class="sr-only">Toque na tela!</span></button>';
+    content.innerHTML = `<h1 class="sr-only">Outubro Rosa. Se toca, mulher! Você conhece o Outubro Rosa?</h1><button class="start side-next" data-action="next" aria-label="Toque na tela para começar">${nextArrow}<span class="side-next-label">Começar</span></button>`;
   } else if (screen === 7) {
     content.innerHTML = '<h1 class="sr-only">Obrigado por participar!</h1><div class="end-actions"><p class="end-message">Informação também é prevenção.</p><button class="selfie-choice" data-action="selfie">Tirar uma selfie <span aria-hidden="true">◎</span></button><button class="end-home" data-action="home">Não, obrigado · Voltar ao início</button></div>';
   } else {
     const [question, verdict, answer] = questions[screen - 1];
-    content.innerHTML = `<div class="question-copy"><h1>${question}</h1><p><strong>${verdict}</strong> ${answer}</p></div><button class="next" data-action="next" aria-label="${screen === 6 ? 'Concluir participação' : 'Próxima pergunta'}">Clique aqui!${hand}</button><nav aria-label="Navegação das perguntas"><button class="back" data-action="back" aria-label="Voltar à tela anterior">← <span>Voltar</span></button><span class="progress" aria-label="Pergunta ${screen} de 6">${questions.map((_, i) => `<i class="${i + 1 === screen ? 'current' : ''}" aria-hidden="true"></i>`).join('')}</span><button class="home" data-action="home" aria-label="Voltar ao início">Início <span aria-hidden="true">↗</span></button></nav>`;
+    content.innerHTML = `<div class="question-copy"><h1>${question}</h1><p><strong>${verdict}</strong> ${answer}</p></div><button class="next side-next" data-action="next" aria-label="${screen === 6 ? 'Concluir participação' : 'Próxima pergunta'}">${nextArrow}<span class="side-next-label">${screen === 6 ? 'Concluir' : 'Próximo'}</span></button><nav aria-label="Navegação das perguntas"><button class="back" data-action="back" aria-label="Voltar à tela anterior">← <span>Voltar</span></button><span class="progress" aria-label="Pergunta ${screen} de 6">${questions.map((_, i) => `<i class="${i + 1 === screen ? 'current' : ''}" aria-hidden="true"></i>`).join('')}</span><button class="home" data-action="home" aria-label="Voltar ao início">Início <span aria-hidden="true">↗</span></button></nav>`;
   }
   if (!keyboard && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     content.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 220, easing: 'cubic-bezier(0.23,1,0.32,1)' });
