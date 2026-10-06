@@ -35,3 +35,14 @@ test('reutiliza a autenticação OIDC fornecida pelo Vercel', () => {
   const result = resolveBlobCredentials({ BLOB_STORE_ID: 'store-test', VERCEL_OIDC_TOKEN: 'oidc-test' });
   assert.deepEqual(result.credentials, { storeId: 'store-test', oidcToken: 'oidc-test' });
 });
+
+test('conexão OIDC funciona sem token em variável de ambiente', () => {
+  const result = resolveBlobCredentials({ BLOB_STORE_ID: 'store-test', BLOB_WEBHOOK_PUBLIC_KEY: 'public-key-test' });
+  assert.deepEqual(result.credentials, { storeId: 'store-test' });
+  assert.equal(result.variable, 'BLOB_STORE_ID');
+});
+
+test('prefere a conexão OIDC atual a um token legado quando o store ID está presente', () => {
+  const result = resolveBlobCredentials({ BLOB_STORE_ID: 'store-test', BLOB_READ_WRITE_TOKEN: 'legacy-test' });
+  assert.deepEqual(result.credentials, { storeId: 'store-test' });
+});

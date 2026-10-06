@@ -27,14 +27,14 @@ Após enviar os arquivos ao GitHub, no Vercel selecione **Add New → Project**,
 Para habilitar o download das selfies:
 
 1. No painel do projeto, abra **Storage** e crie/conecte um **Vercel Blob privado**. Não use um armazenamento público.
-2. Confirme que a conexão adicionou `BLOB_READ_WRITE_TOKEN` às variáveis do projeto para Production (e Preview se for testar nesse ambiente). Nunca exponha esse token no frontend ou adicione um prefixo `VITE_`.
+2. Habilite Production (e Preview se for testar nesse ambiente). As conexões atuais usam **OIDC** e adicionam `BLOB_STORE_ID`; o SDK obtém a identidade do runtime automaticamente. Uma conexão legada com `BLOB_READ_WRITE_TOKEN` também é suportada. Nunca exponha tokens no frontend ou adicione um prefixo `VITE_`.
 3. Faça um novo deploy para que a função receba a variável.
 4. No navegador do totem, permita o uso da webcam. Ela precisa estar conectada ao computador que executa o navegador. Use Chrome ou Edge atualizado em HTTPS.
 5. Percorra as perguntas, escolha **Tirar uma selfie**, toque em **Tirar foto** e aguarde a contagem de **5 segundos** para se posicionar. Confira a foto e confirme **Gerar QR Code para baixar**. Leia o QR com um celular e confira o download. Esse teste real depende do armazenamento configurado e de uma webcam física.
 
-O Blob pode gerar cobrança conforme o uso na sua conta Vercel. Sem a variável, as telas educativas e a captura local continuam disponíveis; o envio apresenta uma mensagem de configuração pendente.
+O Blob pode gerar cobrança conforme o uso na sua conta Vercel. Sem uma conexão OIDC ou token configurado, as telas educativas e a captura local continuam disponíveis; o envio apresenta uma mensagem de configuração pendente.
 
-Se o QR não é gerado e o download aparece indisponível, confira a variável `BLOB_READ_WRITE_TOKEN` em **Settings → Environment Variables**, no ambiente do deploy que está sendo usado. Conectar o Blob depois de um deploy não injeta a variável naquele deploy: execute **Redeploy** após conectar. Se a conexão do Storage oferecer outro prefixo para a variável, escolha o prefixo padrão `BLOB`.
+Se o QR não é gerado e o download aparece indisponível, confira a conexão em **Storage → Projects** e a presença de `BLOB_STORE_ID` em **Settings → Environment Variables**, no ambiente do deploy que está sendo usado. Conectar o Blob depois de um deploy não injeta a variável naquele deploy: execute **Redeploy** após conectar. O SDK recebe o token OIDC pelo contexto do runtime; ele não precisa aparecer nas variáveis do projeto. Use o prefixo padrão `BLOB` para a conexão OIDC.
 
 Para testar a API, execute `npm test`. `npm run dev` e `npm run preview` servem somente o frontend: a função é executada pelo Vercel. Testes locais da API com credenciais reais exigem um ambiente Vercel configurado.
 
@@ -60,7 +60,7 @@ As camadas decorativas têm um efeito de profundidade/parallax nas trocas de tel
 
 ### Diagnóstico do compartilhamento
 
-Abra `/api/selfie?status=1` no domínio do deploy para verificar apenas a presença de autenticação (`configured` e `authentication`), sem mostrar nenhum valor de credencial. `configured: true` informa que há uma configuração; não comprova que o token tem acesso ao Blob privado. A API aceita `BLOB_READ_WRITE_TOKEN` ou a combinação de `BLOB_STORE_ID` com `VERCEL_OIDC_TOKEN` fornecida pela plataforma. Uma resposta 503 ao upload significa ausência da configuração. Uma resposta 502 indica falha ao acessar o armazenamento; confira o vínculo, o tipo privado do Blob e a permissão da credencial no Vercel.
+Abra `/api/selfie?status=1` no domínio do deploy para verificar apenas a presença de configuração (`configured` e `authentication`), sem mostrar nenhum valor de credencial. `configured: true` informa que há uma configuração; não comprova acesso ao Blob privado. A API usa `BLOB_STORE_ID` com autenticação OIDC automática do SDK ou, para conexões legadas, `BLOB_READ_WRITE_TOKEN`. Uma resposta 503 ao upload significa ausência da configuração. Uma resposta 502 indica falha ao acessar o armazenamento; confira o vínculo, o tipo privado do Blob e a permissão da identidade no Vercel.
 
 Também é reconhecida uma única conexão de Blob com prefixo personalizado (por exemplo, `ROSA_BLOB_READ_WRITE_TOKEN`). Havendo vários tokens sem uma variável padrão, o diagnóstico informa `MULTIPLE_BLOB_BINDINGS`: nesse caso, escolha explicitamente o armazenamento da campanha com `BLOB_READ_WRITE_TOKEN`. O diagnóstico mostra somente nomes das variáveis e o identificador do commit do deploy, nunca valores de credenciais.
 

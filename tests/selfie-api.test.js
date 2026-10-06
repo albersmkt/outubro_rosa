@@ -111,3 +111,14 @@ test('aceita autenticação OIDC já vinculada ao armazenamento', async () => {
   assert.equal(JSON.parse(diagnostic.body).authentication, 'oidc');
   assert.ok(!diagnostic.body.includes('test-only-oidc'));
 });
+
+test('upload e download usam OIDC automático sem exigir token de ambiente', async () => {
+  const f = fixture({ storeId: 'test-store' });
+  const upload = await f.call('POST');
+  assert.equal(upload.statusCode, 201);
+  const { id } = JSON.parse(upload.body);
+  assert.equal((await f.call('GET', `/api/selfie?id=${id}`)).statusCode, 200);
+  const diagnostic = JSON.parse((await f.call('GET', '/api/selfie?status=1')).body);
+  assert.equal(diagnostic.configured, true);
+  assert.equal(diagnostic.authentication, 'oidc');
+});
