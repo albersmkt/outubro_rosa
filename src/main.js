@@ -1,6 +1,7 @@
 import '@fontsource/poppins/latin-400.css';
 import '@fontsource/poppins/latin-700.css';
 import './style.css';
+import { startSelfie, showSharedSelfie } from './selfie.js';
 
 const questions = [
   ['O câncer de mama sempre causa dor?', 'NÃO.', 'Em fases iniciais, pode não causar dor nem outros sintomas.'],
@@ -17,6 +18,8 @@ const artwork = document.querySelector('#artwork');
 const hand = '<svg class="hand" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="m24 33-10-14c-3-4-8 0-5 4l17 25-8-3c-6-2-8 4-3 7l16 9c3 2 6 2 9 0l16-11c3-2 3-6 1-9L45 23c-3-4-7-1-5 3l-3-5c-3-4-7-1-5 3l-3-4c-3-4-8-1-5 3l7 11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 let screen = 0;
 let timer;
+let closeSelfie;
+const sharedPhoto = new URLSearchParams(location.search).get('selfie');
 const IDLE_MS = 90000;
 const END_MS = 20000;
 
@@ -28,10 +31,13 @@ for (const name of ['abertura', 'perguntas', 'encerramento']) {
 
 function resetTimer() {
   clearTimeout(timer);
+  if (closeSelfie || sharedPhoto) return;
   if (screen > 0) timer = setTimeout(() => show(0), screen === 7 ? END_MS : IDLE_MS);
 }
 
 function show(next, keyboard = false) {
+  closeSelfie?.();
+  closeSelfie = undefined;
   content.getAnimations().forEach(animation => animation.cancel());
   screen = Math.max(0, Math.min(7, next));
   totem.dataset.screen = screen === 0 ? 'welcome' : screen === 7 ? 'end' : 'question';
@@ -39,7 +45,7 @@ function show(next, keyboard = false) {
   if (screen === 0) {
     content.innerHTML = '<h1 class="sr-only">Outubro Rosa. Se toca, mulher! Você conhece o Outubro Rosa?</h1><button class="start" data-action="next" aria-label="Toque na tela para começar"><span class="sr-only">Toque na tela!</span></button>';
   } else if (screen === 7) {
-    content.innerHTML = '<h1 class="sr-only">Obrigado por participar! Informação também é prevenção.</h1><button class="restart" data-action="home">Participar novamente <span aria-hidden="true">↻</span></button>';
+    content.innerHTML = '<h1 class="sr-only">Obrigado por participar! Informação também é prevenção.</h1><div class="end-actions"><button class="selfie-choice" data-action="selfie">Tirar uma selfie <span aria-hidden="true">◎</span></button><button class="end-home" data-action="home">Não, obrigado · Voltar ao início</button></div>';
   } else {
     const [question, verdict, answer] = questions[screen - 1];
     content.innerHTML = `<div class="question-copy"><h1>${question}</h1><p><strong>${verdict}</strong> ${answer}</p></div><button class="next" data-action="next" aria-label="${screen === 6 ? 'Concluir participação' : 'Próxima pergunta'}">Clique aqui!${hand}</button><nav aria-label="Navegação das perguntas"><button class="back" data-action="back" aria-label="Voltar à tela anterior">← <span>Voltar</span></button><span class="progress" aria-label="Pergunta ${screen} de 6">${questions.map((_, i) => `<i class="${i + 1 === screen ? 'current' : ''}" aria-hidden="true"></i>`).join('')}</span><button class="home" data-action="home" aria-label="Voltar ao início">Início <span aria-hidden="true">↗</span></button></nav>`;
@@ -56,10 +62,20 @@ content.addEventListener('click', event => {
   const button = event.target.closest('[data-action]');
   if (!button) return;
   const action = button.dataset.action;
+  if (action === 'selfie') {
+    clearTimeout(timer);
+    closeSelfie = startSelfie({ container: content, goHome: () => show(0) });
+    return;
+  }
   show(action === 'home' ? 0 : screen + (action === 'back' ? -1 : 1), event.detail === 0);
 });
 document.addEventListener('pointerdown', resetTimer, { passive: true });
 document.addEventListener('keydown', event => {
+  if (sharedPhoto) return;
+  if (closeSelfie) {
+    if (event.key === 'Escape' || event.key === 'Home') show(0, true);
+    return;
+  }
   resetTimer();
   if (['ArrowRight', 'ArrowLeft', 'Escape', 'Home'].includes(event.key)) {
     event.preventDefault();
@@ -67,6 +83,8 @@ document.addEventListener('keydown', event => {
   }
 });
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) show(0, true);
+  if (document.hidden && closeSelfie) show(0, true);
+  else if (!document.hidden && !sharedPhoto) show(0, true);
 });
-show(0, true);
+if (sharedPhoto) showSharedSelfie({ container: content, id: sharedPhoto });
+else show(0, true);

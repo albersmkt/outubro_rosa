@@ -18,19 +18,37 @@ npm run build
 npm run preview
 ```
 
-Publique o conteúdo de `dist/` em um servidor estático. Todas as imagens e fontes são locais: a aplicação não usa APIs ou recursos de terceiros durante a exibição. É necessário carregar o site pelo servidor; não abra o HTML diretamente por `file://`.
+As telas educativas usam imagens e fontes locais. O recurso opcional de selfie usa a função `api/selfie.js` e um Vercel Blob privado: para esse recurso, publique o projeto completo no Vercel. Uma hospedagem apenas estática permite navegar pelas perguntas, mas não permite compartilhar selfies entre aparelhos. É necessário carregar o site pelo servidor; não abra o HTML diretamente por `file://`.
 
 ### Vercel
 
-Após enviar os arquivos ao GitHub, no Vercel selecione **Add New → Project**, importe `albersmkt/outubro_rosa` e clique em **Deploy**. A configuração `vercel.json` seleciona Vite, executa `npm run build` e publica `dist/`. Não são necessárias variáveis de ambiente. Use o endereço HTTPS gerado pelo Vercel para abrir o site no computador ou na TV.
+Após enviar os arquivos ao GitHub, no Vercel selecione **Add New → Project**, importe `albersmkt/outubro_rosa` e clique em **Deploy**. A configuração `vercel.json` seleciona Vite, executa `npm run build` e publica `dist/`. Use o endereço HTTPS gerado pelo Vercel para abrir o site no computador ou na TV.
+
+Para habilitar o download das selfies:
+
+1. No painel do projeto, abra **Storage** e crie/conecte um **Vercel Blob privado**. Não use um armazenamento público.
+2. Confirme que a conexão adicionou `BLOB_READ_WRITE_TOKEN` às variáveis do projeto para Production (e Preview se for testar nesse ambiente). Nunca exponha esse token no frontend ou adicione um prefixo `VITE_`.
+3. Faça um novo deploy para que a função receba a variável.
+4. No navegador do totem, permita o uso da webcam. Ela precisa estar conectada ao computador que executa o navegador. Use Chrome ou Edge atualizado em HTTPS.
+5. Percorra as perguntas, escolha **Tirar uma selfie**, tire a foto e confirme **Gerar QR Code para baixar**. Leia o QR com um celular e confira o download. Esse teste real depende do armazenamento configurado e de uma webcam física.
+
+O Blob pode gerar cobrança conforme o uso na sua conta Vercel. Sem a variável, as telas educativas e a captura local continuam disponíveis; o envio apresenta uma mensagem de configuração pendente.
+
+Para testar a API, execute `npm test`. `npm run dev` e `npm run preview` servem somente o frontend: a função é executada pelo Vercel. Testes locais da API com credenciais reais exigem um ambiente Vercel configurado.
 
 ## Uso no totem
 
 Configure a TV em orientação vertical e abra o navegador em modo kiosk/tela cheia. A área útil mantém 9:16 (referência: 1080 × 1920), sem cortes e sem rolagem. Em telas com outra proporção, aparecem margens.
 
-Toque em “Toque na tela!” para começar e em “Clique aqui!” para avançar. “Voltar” retorna à tela anterior, “Início” reinicia e “Participar novamente” reinicia após o encerramento. Setas do teclado navegam; Escape e Home retornam ao início.
+Toque em “Toque na tela!” para começar e em “Clique aqui!” para avançar. “Voltar” retorna à tela anterior e “Início” reinicia. No encerramento, escolha **Tirar uma selfie** ou **Não, obrigado · Voltar ao início**. Setas do teclado navegam pelas telas educativas; Escape e Home retornam ao início, inclusive durante a selfie.
 
-Após 90 segundos sem interação nas perguntas, a sessão retorna à abertura. O encerramento permanece por 20 segundos e também retorna à abertura. Os tempos estão em `src/main.js`. Uma aba que volta a ficar visível inicia uma nova sessão. Não são armazenados dados pessoais.
+Após 90 segundos sem interação nas perguntas, a sessão retorna à abertura. O encerramento permanece por 20 segundos e também retorna à abertura. Os tempos estão em `src/main.js`. A câmera/confirmacão aguarda até 90 segundos; após gerar o QR Code, a tela retorna à abertura em **45 segundos**, com contador visível. Os tempos da selfie estão em `src/selfie.js`. A câmera é desligada após a captura, ao sair da selfie ou ao ocultar a aba. A foto local e sua URL temporária são descartadas ao reiniciar a sessão. A página de download no celular não reinicia automaticamente.
+
+### Fotos temporárias
+
+Apenas após confirmar **Gerar QR Code para baixar**, a imagem JPEG (até 2 MB) é enviada ao armazenamento privado. O QR contém um link com identificador aleatório, que permite a quem o possui baixar a foto por **15 minutos**, inclusive após o totem voltar ao início. A API bloqueia links vencidos, não envia a URL privada do Blob ao navegador e impede cache da foto.
+
+A expiração do link não é uma exclusão agendada: fotos vencidas são excluídas quando alguém tenta acessar o link ou quando a próxima selfie é enviada. Se não houver novos acessos/uploads, os arquivos ficam no armazenamento privado, sem acesso pela API; ao encerrar o evento, exclua os arquivos da pasta `outubro-rosa-selfies/` pelo painel Storage. Não existe galeria pública e nenhum outro dado do visitante é solicitado.
 
 ## Conteúdo e arte
 
