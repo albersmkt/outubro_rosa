@@ -58,6 +58,8 @@ A expiração do link não é uma exclusão agendada: fotos vencidas são exclu�
 
 As camadas decorativas têm um efeito de profundidade/parallax nas trocas de tela e no movimento do mouse, com movimento reduzido quando solicitado pelo navegador. Textos, botões, enquadramento da câmera e QR Code não acompanham o mouse. As telas da selfie reservam áreas separadas para cabeçalho, foto/conteúdo, ações e rodapé. A contagem pode ser cancelada por **Voltar ao início** ou Escape, desligando a câmera e cancelando a captura pendente.
 
+Os botões de entrada na selfie, captura, refazer, gerar QR, tentar novamente e voltar ao início ficam em uma coluna na lateral direita, centralizada verticalmente. A câmera, a foto, os textos e o QR usam uma área separada à esquerda. A página de download no celular mantém o botão abaixo da foto.
+
 A abertura e o encerramento usam o vídeo enviado das mulheres, em loop, mantendo a proporção 9:16. A faixa de áudio foi removida de `public/assets/mulheres-outubro-rosa.mp4`; o player também fica mudo e usa `playsinline`. O vídeo pausa durante perguntas, selfie, download no celular e quando a aba fica oculta. Com movimento reduzido, permanece parado; se a reprodução automática for bloqueada, o poster local mantém a imagem de fundo. As sobreposições SVG preservam o lettering e as mensagens da campanha sem a fotografia antiga.
 
 ### Diagnóstico do compartilhamento

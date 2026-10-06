@@ -32,7 +32,10 @@ export function startSelfie({ container, goHome }) {
     timer = setTimeout(goHome, SESSION_MS);
   };
   const shell = (title, description, body) => {
-    container.innerHTML = `<section class="selfie-panel"><header class="selfie-header"><span class="selfie-eyebrow">OUTUBRO ROSA</span><h1>${title}</h1><p class="selfie-description">${description}</p></header><div class="selfie-body">${body}</div><footer class="selfie-footer"><button class="selfie-cancel" data-selfie="exit">Voltar ao início</button></footer></section>`;
+    container.innerHTML = `<section class="selfie-panel selfie-totem"><header class="selfie-header"><span class="selfie-eyebrow">OUTUBRO ROSA</span><h1>${title}</h1><p class="selfie-description">${description}</p></header><div class="selfie-body">${body}</div><aside class="selfie-controls" aria-label="Ações da selfie"><button class="selfie-cancel" data-selfie="exit">Voltar ao início</button></aside></section>`;
+    const controls = container.querySelector('.selfie-controls');
+    const exit = controls.querySelector('button');
+    container.querySelectorAll('.selfie-body button').forEach(button => controls.insertBefore(button, exit));
   };
   const error = (message, retry) => {
     shell('Vamos tentar de novo?', message, `<div class="selfie-error" role="alert">${retry === 'camera' ? '◎' : '♡'}</div><button class="selfie-primary" data-selfie="${retry}">Tentar novamente</button>`);

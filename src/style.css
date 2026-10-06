@@ -35,11 +35,20 @@ nav button { border: 0; padding: 2cqw 1cqw; min-height: 8.5cqw; font-size: 2.8cq
 .end-actions .end-message { font-size: 3cqw; text-align: center; line-height: 1.4; margin: 0; text-transform: uppercase; }
 .selfie-choice { min-height: 8cqw; font-size: 3.4cqw; font-weight: 700; background: #92173ef2; border: .3cqw solid white; border-radius: 6cqw; }
 .end-home { min-height: 6cqw; font-size: 2.5cqw; border: 0; }
+.end-selfie-controls { position: absolute; top: 50%; right: 3cqw; width: 24cqw; transform: translateY(-50%); display: grid; gap: 2cqw; }
+.end-selfie-controls button { min-height: 12cqw; padding: 2cqw; border-radius: 4cqw; font-size: 3cqw; line-height: 1.4; }
+.end-selfie-controls .end-home { background: #701033e8; border: .3cqw solid #ffffff80; }
 .selfie-panel { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 3cqw; padding: 7cqw 7cqw 4cqw; text-align: center; background: linear-gradient(160deg,#fb5598,#d81851); }
 .selfie-header { min-width: 0; }
 .selfie-body { min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 2.8cqw; padding: 1cqw 0; }
 .selfie-body > * { flex-shrink: 0; }
 .selfie-footer { min-height: 8cqw; }
+.selfie-totem { grid-template-rows: auto minmax(0,1fr); padding-right: 33cqw; }
+.selfie-totem h1 { font-size: 5.2cqw; }
+.selfie-totem .selfie-description { font-size: 3.2cqw; }
+.selfie-controls { position: absolute; top: 50%; right: 3cqw; width: 24cqw; transform: translateY(-50%); display: grid; gap: 2cqw; }
+.selfie-controls button { min-height: 12cqw; padding: 2cqw; border-radius: 4cqw; font-size: 3cqw; line-height: 1.4; }
+.selfie-controls .selfie-cancel { border: .3cqw solid #ffffff80; background: #8b153a; }
 .selfie-eyebrow { font-size: 2.7cqw; letter-spacing: .6cqw; font-weight: 700; }
 .selfie-panel h1 { font-size: 6cqw; font-weight: 700; line-height: 1.18; margin: 2.6cqw 0; }
 .selfie-panel .selfie-description { margin: 0; font-size: 3.4cqw; line-height: 1.5; }
