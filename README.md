@@ -30,9 +30,11 @@ Para habilitar o download das selfies:
 2. Confirme que a conexão adicionou `BLOB_READ_WRITE_TOKEN` às variáveis do projeto para Production (e Preview se for testar nesse ambiente). Nunca exponha esse token no frontend ou adicione um prefixo `VITE_`.
 3. Faça um novo deploy para que a função receba a variável.
 4. No navegador do totem, permita o uso da webcam. Ela precisa estar conectada ao computador que executa o navegador. Use Chrome ou Edge atualizado em HTTPS.
-5. Percorra as perguntas, escolha **Tirar uma selfie**, tire a foto e confirme **Gerar QR Code para baixar**. Leia o QR com um celular e confira o download. Esse teste real depende do armazenamento configurado e de uma webcam física.
+5. Percorra as perguntas, escolha **Tirar uma selfie**, toque em **Tirar foto** e aguarde a contagem de **5 segundos** para se posicionar. Confira a foto e confirme **Gerar QR Code para baixar**. Leia o QR com um celular e confira o download. Esse teste real depende do armazenamento configurado e de uma webcam física.
 
 O Blob pode gerar cobrança conforme o uso na sua conta Vercel. Sem a variável, as telas educativas e a captura local continuam disponíveis; o envio apresenta uma mensagem de configuração pendente.
+
+Se o QR não é gerado e o download aparece indisponível, confira a variável `BLOB_READ_WRITE_TOKEN` em **Settings → Environment Variables**, no ambiente do deploy que está sendo usado. Conectar o Blob depois de um deploy não injeta a variável naquele deploy: execute **Redeploy** após conectar. Se a conexão do Storage oferecer outro prefixo para a variável, escolha o prefixo padrão `BLOB`.
 
 Para testar a API, execute `npm test`. `npm run dev` e `npm run preview` servem somente o frontend: a função é executada pelo Vercel. Testes locais da API com credenciais reais exigem um ambiente Vercel configurado.
 
@@ -49,6 +51,10 @@ Após 90 segundos sem interação nas perguntas, a sessão retorna à abertura. 
 Apenas após confirmar **Gerar QR Code para baixar**, a imagem JPEG (até 2 MB) é enviada ao armazenamento privado. O QR contém um link com identificador aleatório, que permite a quem o possui baixar a foto por **15 minutos**, inclusive após o totem voltar ao início. A API bloqueia links vencidos, não envia a URL privada do Blob ao navegador e impede cache da foto.
 
 A expiração do link não é uma exclusão agendada: fotos vencidas são excluídas quando alguém tenta acessar o link ou quando a próxima selfie é enviada. Se não houver novos acessos/uploads, os arquivos ficam no armazenamento privado, sem acesso pela API; ao encerrar o evento, exclua os arquivos da pasta `outubro-rosa-selfies/` pelo painel Storage. Não existe galeria pública e nenhum outro dado do visitante é solicitado.
+
+### Movimento e disposição
+
+As camadas decorativas têm um efeito de profundidade/parallax nas trocas de tela e no movimento do mouse, com movimento reduzido quando solicitado pelo navegador. Textos, botões, enquadramento da câmera e QR Code não acompanham o mouse. As telas da selfie reservam áreas separadas para cabeçalho, foto/conteúdo, ações e rodapé. A contagem pode ser cancelada por **Voltar ao início** ou Escape, desligando a câmera e cancelando a captura pendente.
 
 ## Conteúdo e arte
 
