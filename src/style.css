@@ -1,0 +1,27 @@
+:root { font-family: 'Poppins', sans-serif; color: white; background: #240c19; font-synthesis: none; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+body { display: grid; place-items: center; min-height: 100dvh; }
+#totem { position: relative; width: min(100vw, 56.25vh); width: min(100vw, 56.25dvh); aspect-ratio: 9 / 16; container-type: inline-size; background: #ee2865; overflow: hidden; isolation: isolate; }
+#artwork { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; user-select: none; pointer-events: none; }
+#content { position: absolute; inset: 0; }
+button { font: inherit; color: inherit; background: transparent; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform 150ms cubic-bezier(.23,1,.32,1), background-color 150ms ease; }
+button:active { transform: scale(.97); }
+button:focus-visible { outline: 4px solid white; outline-offset: 6px; box-shadow: 0 0 0 9px #871d48; }
+.start { position: absolute; left: 41%; top: 89.7%; width: 51%; height: 8%; border: 0; border-radius: 7cqw; }
+.question-copy { position: absolute; top: 37.5%; left: 5.4%; right: 5.4%; text-align: center; }
+h1, p { margin: 0; font-size: 5.7cqw; line-height: 1.42; font-weight: 400; text-wrap: pretty; }
+p { margin-top: 3.7cqw; }
+strong { font-weight: 700; }
+.next { position: absolute; left: 42.4%; top: 85.2%; width: 47%; height: 6.2%; border: .5cqw solid white; border-radius: 5cqw; font-size: 4.6cqw; }
+.hand { position: absolute; width: 11cqw; height: 11cqw; right: -2cqw; bottom: -4.2cqw; background: #e72460; border-radius: 40%; }
+nav { position: absolute; inset: auto 5.4% 2.3%; display: flex; align-items: center; justify-content: space-between; gap: 2cqw; }
+nav button { border: 0; padding: 2cqw 1cqw; min-height: 8.5cqw; font-size: 2.8cqw; }
+.progress { display: flex; gap: 1.7cqw; }
+.progress i { width: 1.3cqw; height: 1.3cqw; border: .2cqw solid white; border-radius: 50%; }
+.progress i.current { background: white; }
+.restart { position: absolute; bottom: 2%; left: 22%; width: 56%; min-height: 8cqw; font-size: 3cqw; background: #94173dcc; border: .3cqw solid #ffffffa6; border-radius: 6cqw; }
+.restart span { margin-left: 1cqw; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (hover: hover) and (pointer: fine) { .next:hover, .restart:hover { background-color: #b7134380; } }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } button:active { transform: none; } }
