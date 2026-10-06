@@ -3,13 +3,16 @@
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
 body { display: grid; place-items: center; min-height: 100dvh; }
 #totem { position: relative; width: min(100vw, 56.25vh); width: min(100vw, 56.25dvh); aspect-ratio: 9 / 16; container-type: inline-size; background: #ee2865; overflow: hidden; isolation: isolate; }
-#artwork { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; user-select: none; pointer-events: none; z-index: 0; }
-.depth-scene { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+#campaign-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; display: none; }
+.video-shade { position: absolute; inset: 0; z-index: 1; pointer-events: none; display: none; background: linear-gradient(180deg,#97103b55 0%,transparent 42%,#86133233 65%,#67102eb3 100%); }
+#totem[data-screen="welcome"] #campaign-video, #totem[data-screen="end"] #campaign-video, #totem[data-screen="welcome"] .video-shade, #totem[data-screen="end"] .video-shade { display: block; }
+#artwork { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; user-select: none; pointer-events: none; z-index: 2; }
+.depth-scene { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 3; }
 .depth-layer { position: absolute; transition: transform 240ms var(--ease-out); pointer-events: none; }
 .depth-halo { width: 65cqw; height: 65cqw; top: -27cqw; right: -22cqw; border-radius: 50%; background: radial-gradient(circle,#fff6,transparent 68%); }
 .depth-ring { width: 42cqw; height: 42cqw; top: 48cqw; right: -34cqw; border: .3cqw solid #ffffff30; border-radius: 50%; box-shadow: 0 0 0 5cqw #ffffff05; }
 .depth-petal { width: 35cqw; height: 35cqw; top: 105cqw; left: -30cqw; border: .3cqw solid #ffffff25; border-radius: 50% 50% 8% 50%; }
-#content { position: absolute; inset: 0; z-index: 2; }
+#content { position: absolute; inset: 0; z-index: 4; }
 button { font: inherit; color: inherit; background: transparent; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform 150ms cubic-bezier(.23,1,.32,1), background-color 150ms ease; }
 button:active { transform: scale(.97); }
 button:focus-visible, a:focus-visible { outline: .45cqw solid #67102e; outline-offset: .5cqw; }

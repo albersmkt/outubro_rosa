@@ -16,6 +16,10 @@ const questions = [
 const totem = document.querySelector('#totem');
 const content = document.querySelector('#content');
 const artwork = document.querySelector('#artwork');
+const campaignVideo = document.querySelector('#campaign-video');
+const reduceVideoMotion = matchMedia('(prefers-reduced-motion: reduce)');
+campaignVideo.muted = true;
+campaignVideo.defaultMuted = true;
 const depth = createDepthMotion(totem);
 const hand = '<svg class="hand" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="m24 33-10-14c-3-4-8 0-5 4l17 25-8-3c-6-2-8 4-3 7l16 9c3 2 6 2 9 0l16-11c3-2 3-6 1-9L45 23c-3-4-7-1-5 3l-3-5c-3-4-7-1-5 3l-3-4c-3-4-8-1-5 3l7 11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 let screen = 0;
@@ -26,10 +30,19 @@ const IDLE_MS = 90000;
 const END_MS = 20000;
 
 // Load the three local artworks before they are needed.
-for (const name of ['abertura', 'perguntas', 'encerramento']) {
+for (const path of ['abertura-video.svg', 'perguntas.png', 'encerramento-video.svg']) {
   const img = new Image();
-  img.src = `/assets/${name}.png`;
+  img.src = `/assets/${path}`;
 }
+
+function syncCampaignVideo() {
+  const shouldPlay = !document.hidden && !sharedPhoto && !closeSelfie && (screen === 0 || screen === 7) && !reduceVideoMotion.matches;
+  campaignVideo.autoplay = shouldPlay;
+  if (shouldPlay) {
+    campaignVideo.play().catch(() => { /* The local poster remains visible if autoplay is unavailable. */ });
+  } else campaignVideo.pause();
+}
+reduceVideoMotion.addEventListener('change', syncCampaignVideo);
 
 function resetTimer() {
   clearTimeout(timer);
@@ -44,7 +57,8 @@ function show(next, keyboard = false) {
   depth.changeScreen(keyboard);
   screen = Math.max(0, Math.min(7, next));
   totem.dataset.screen = screen === 0 ? 'welcome' : screen === 7 ? 'end' : 'question';
-  artwork.src = `/assets/${screen === 0 ? 'abertura' : screen === 7 ? 'encerramento' : 'perguntas'}.png`;
+  artwork.src = `/assets/${screen === 0 ? 'abertura-video.svg' : screen === 7 ? 'encerramento-video.svg' : 'perguntas.png'}`;
+  syncCampaignVideo();
   if (screen === 0) {
     content.innerHTML = '<h1 class="sr-only">Outubro Rosa. Se toca, mulher! Você conhece o Outubro Rosa?</h1><button class="start" data-action="next" aria-label="Toque na tela para começar"><span class="sr-only">Toque na tela!</span></button>';
   } else if (screen === 7) {
@@ -68,6 +82,8 @@ content.addEventListener('click', event => {
   if (action === 'selfie') {
     clearTimeout(timer);
     totem.dataset.screen = 'selfie';
+    campaignVideo.autoplay = false;
+    campaignVideo.pause();
     closeSelfie = startSelfie({ container: content, goHome: () => show(0) });
     return;
   }
@@ -89,6 +105,7 @@ document.addEventListener('keydown', event => {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && closeSelfie) show(0, true);
   else if (!document.hidden && !sharedPhoto) show(0, true);
+  syncCampaignVideo();
 });
-if (sharedPhoto) showSharedSelfie({ container: content, id: sharedPhoto });
+if (sharedPhoto) { campaignVideo.autoplay = false; campaignVideo.pause(); showSharedSelfie({ container: content, id: sharedPhoto }); }
 else show(0, true);
