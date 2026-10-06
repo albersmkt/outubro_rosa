@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { createCampaignPhoto } from './photo.js';
 
 const SHARE_SECONDS = 45;
 const SESSION_MS = 90000;
@@ -101,23 +102,22 @@ export function startSelfie({ container, goHome }) {
     const video = container.querySelector('video');
     if (!video?.videoWidth) return;
     container.querySelector('[data-selfie="capture"]').disabled = true;
-    const canvas = document.createElement('canvas');
-    const scale = Math.min(1, 1280 / video.videoWidth);
-    canvas.width = Math.round(video.videoWidth * scale);
-    canvas.height = Math.round(video.videoHeight * scale);
-    const ctx = canvas.getContext('2d');
-    // Save the same mirrored framing the visitor saw in the preview.
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const image = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .88));
+    clearCaptureCountdown();
+    container.querySelector('.capture-countdown')?.remove();
+    container.querySelector('[data-selfie="capture"]').textContent = 'Preparando sua foto…';
+    let image;
+    try { image = await createCampaignPhoto(video); }
+    catch {
+      if (!disposed) { stopCamera(); error('Não foi possível preparar sua foto. Tente novamente.', 'camera'); }
+      return;
+    }
     if (disposed) return;
     if (!image) { error('Não foi possível tirar a foto. Tente novamente.', 'camera'); return; }
     stopCamera();
     photo = image;
     if (photoURL) URL.revokeObjectURL(photoURL);
     photoURL = URL.createObjectURL(photo);
-    shell('Gostou da sua selfie?', 'Guarde esse momento de cuidado com você.', `<img class="selfie-photo" src="${photoURL}" alt="Sua selfie capturada" /><button class="selfie-primary" data-selfie="share">Gerar QR Code para baixar</button><button class="selfie-secondary" data-selfie="camera">Tirar outra foto</button><p class="selfie-note">Ao gerar o QR Code, a foto será enviada para download temporário.</p>`);
+    shell('Gostou da sua selfie?', 'Sua foto já está com a identidade do Outubro Rosa.', `<img class="selfie-photo" src="${photoURL}" alt="Sua selfie com logo e moldura do Outubro Rosa" /><button class="selfie-primary" data-selfie="share">Gerar QR Code para baixar</button><button class="selfie-secondary" data-selfie="camera">Tirar outra foto</button><p class="selfie-note">Ao gerar o QR Code, a foto será enviada para download temporário.</p>`);
     armIdle();
   }
 

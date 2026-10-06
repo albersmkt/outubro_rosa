@@ -5,7 +5,16 @@ export const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 const PREFIX = 'outubro-rosa-selfies/';
 const VALID_ID = /^(\d{13})-([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/;
 
-export function createSelfieHandler({ storage, token = () => process.env.BLOB_READ_WRITE_TOKEN, now = Date.now, uuid = randomUUID }) {
+function existingCredentials() {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+  // Current Vercel Blob SDK also supports the platform's OIDC authentication.
+  if (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN) {
+    return { storeId: process.env.BLOB_STORE_ID, oidcToken: process.env.VERCEL_OIDC_TOKEN };
+  }
+  return null;
+}
+
+export function createSelfieHandler({ storage, token = existingCredentials, now = Date.now, uuid = randomUUID }) {
   function json(res, status, body) {
     res.statusCode = status;
     res.setHeader('Content-Type', 'application/json');
@@ -15,12 +24,12 @@ export function createSelfieHandler({ storage, token = () => process.env.BLOB_RE
   async function cleanup(auth) {
     let cursor;
     do {
-      const page = await storage.list({ prefix: PREFIX, limit: 1000, cursor, token: auth });
+      const page = await storage.list({ prefix: PREFIX, limit: 1000, cursor, ...auth });
       const expired = page.blobs.filter(blob => {
         const id = blob.pathname.slice(PREFIX.length).replace(/\.jpg$/, '');
         return VALID_ID.test(id) && now() - Number(id.split('-')[0]) >= PHOTO_TTL_MS;
       });
-      if (expired.length) await storage.del(expired.map(blob => blob.pathname), { token: auth });
+      if (expired.length) await storage.del(expired.map(blob => blob.pathname), auth);
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
   }
@@ -30,11 +39,16 @@ export function createSelfieHandler({ storage, token = () => process.env.BLOB_RE
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
     const auth = token();
+    const credentials = typeof auth === 'string' ? { token: auth } : auth;
     if (!['GET', 'POST'].includes(req.method)) {
       res.setHeader('Allow', 'GET, POST');
       return json(res, 405, { error: 'Método não permitido.' });
     }
-    if (!auth) return json(res, 503, { error: 'Conecte um Vercel Blob privado ao projeto.' });
+    const url = new URL(req.url, 'https://selfie.local');
+    if (req.method === 'GET' && url.searchParams.get('status') === '1') {
+      return json(res, 200, { configured: Boolean(auth), authentication: typeof auth === 'string' ? 'token' : auth ? 'oidc' : 'missing', required: 'Private Vercel Blob connected to this deployment' });
+    }
+    if (!auth) return json(res, 503, { code: 'STORAGE_NOT_CONFIGURED', error: 'Conecte um Vercel Blob privado ao projeto.' });
     try {
       if (req.method === 'POST') {
         // Accept only browser uploads originating from this deployment.
@@ -61,30 +75,29 @@ export function createSelfieHandler({ storage, token = () => process.env.BLOB_RE
         if (body.length > MAX_PHOTO_BYTES) return json(res, 413, { error: 'Imagem muito grande.' });
         if (body.length < 4 || body[0] !== 0xff || body[1] !== 0xd8 || body[2] !== 0xff || body.at(-2) !== 0xff || body.at(-1) !== 0xd9) return json(res, 415, { error: 'JPEG inválido.' });
         // Old photos are removed on the next upload, as well as on an expired read.
-        await cleanup(auth);
+        await cleanup(credentials);
         const id = `${now()}-${uuid()}`;
-        await storage.put(`${PREFIX}${id}.jpg`, body, { access: 'private', contentType: 'image/jpeg', addRandomSuffix: false, token: auth });
+        await storage.put(`${PREFIX}${id}.jpg`, body, { access: 'private', contentType: 'image/jpeg', addRandomSuffix: false, ...credentials });
         return json(res, 201, { id, expiresAt: now() + PHOTO_TTL_MS });
       }
 
-      const url = new URL(req.url, 'https://selfie.local');
       const id = url.searchParams.get('id') || '';
       if (!VALID_ID.test(id)) return json(res, 400, { error: 'Link inválido.' });
       const createdAt = Number(id.split('-')[0]);
       if (createdAt > now()) return json(res, 400, { error: 'Link inválido.' });
       const pathname = `${PREFIX}${id}.jpg`;
       if (now() - createdAt >= PHOTO_TTL_MS) {
-        try { await storage.del(pathname, { token: auth }); } catch { /* Link stays expired even if deletion must be retried later. */ }
+        try { await storage.del(pathname, credentials); } catch { /* Link stays expired even if deletion must be retried later. */ }
         return json(res, 410, { error: 'Este link expirou.' });
       }
-      const result = await storage.get(pathname, { access: 'private', useCache: false, token: auth });
+      const result = await storage.get(pathname, { access: 'private', useCache: false, ...credentials });
       if (!result || !result.stream) return json(res, 404, { error: 'Foto não encontrada.' });
       res.statusCode = 200;
       res.setHeader('Content-Type', 'image/jpeg');
       res.setHeader('Content-Disposition', `${url.searchParams.get('download') === '1' ? 'attachment' : 'inline'}; filename="outubro-rosa-selfie.jpg"`);
       res.end(Buffer.from(await new Response(result.stream).arrayBuffer()));
     } catch {
-      return json(res, 502, { error: 'Não foi possível acessar o armazenamento. Tente novamente.' });
+      return json(res, 502, { code: 'STORAGE_UNAVAILABLE', error: 'Não foi possível acessar o armazenamento. Tente novamente.' });
     }
   };
 }

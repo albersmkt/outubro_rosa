@@ -48,6 +48,8 @@ Após 90 segundos sem interação nas perguntas, a sessão retorna à abertura. 
 
 ### Fotos temporárias
 
+A imagem baixada é um JPEG vertical **1080 × 1920** com o lettering original da campanha, fundo e moldura rosa, selfie central e as frases “Se toca, mulher!” e “Informação também é prevenção”. A identidade está gravada nos pixels da foto, inclusive no arquivo baixado pelo celular. O enquadramento da webcam é preservado sem cortes.
+
 Apenas após confirmar **Gerar QR Code para baixar**, a imagem JPEG (até 2 MB) é enviada ao armazenamento privado. O QR contém um link com identificador aleatório, que permite a quem o possui baixar a foto por **15 minutos**, inclusive após o totem voltar ao início. A API bloqueia links vencidos, não envia a URL privada do Blob ao navegador e impede cache da foto.
 
 A expiração do link não é uma exclusão agendada: fotos vencidas são excluídas quando alguém tenta acessar o link ou quando a próxima selfie é enviada. Se não houver novos acessos/uploads, os arquivos ficam no armazenamento privado, sem acesso pela API; ao encerrar o evento, exclua os arquivos da pasta `outubro-rosa-selfies/` pelo painel Storage. Não existe galeria pública e nenhum outro dado do visitante é solicitado.
@@ -55,6 +57,10 @@ A expiração do link não é uma exclusão agendada: fotos vencidas são exclu�
 ### Movimento e disposição
 
 As camadas decorativas têm um efeito de profundidade/parallax nas trocas de tela e no movimento do mouse, com movimento reduzido quando solicitado pelo navegador. Textos, botões, enquadramento da câmera e QR Code não acompanham o mouse. As telas da selfie reservam áreas separadas para cabeçalho, foto/conteúdo, ações e rodapé. A contagem pode ser cancelada por **Voltar ao início** ou Escape, desligando a câmera e cancelando a captura pendente.
+
+### Diagnóstico do compartilhamento
+
+Abra `/api/selfie?status=1` no domínio do deploy para verificar apenas a presença de autenticação (`configured` e `authentication`), sem mostrar nenhum valor de credencial. `configured: true` informa que há uma configuração; não comprova que o token tem acesso ao Blob privado. A API aceita `BLOB_READ_WRITE_TOKEN` ou a combinação de `BLOB_STORE_ID` com `VERCEL_OIDC_TOKEN` fornecida pela plataforma. Uma resposta 503 ao upload significa ausência da configuração. Uma resposta 502 indica falha ao acessar o armazenamento; confira o vínculo, o tipo privado do Blob e a permissão da credencial no Vercel.
 
 ## Conteúdo e arte
 
