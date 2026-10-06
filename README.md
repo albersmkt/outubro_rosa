@@ -62,6 +62,8 @@ As camadas decorativas têm um efeito de profundidade/parallax nas trocas de tel
 
 Abra `/api/selfie?status=1` no domínio do deploy para verificar apenas a presença de autenticação (`configured` e `authentication`), sem mostrar nenhum valor de credencial. `configured: true` informa que há uma configuração; não comprova que o token tem acesso ao Blob privado. A API aceita `BLOB_READ_WRITE_TOKEN` ou a combinação de `BLOB_STORE_ID` com `VERCEL_OIDC_TOKEN` fornecida pela plataforma. Uma resposta 503 ao upload significa ausência da configuração. Uma resposta 502 indica falha ao acessar o armazenamento; confira o vínculo, o tipo privado do Blob e a permissão da credencial no Vercel.
 
+Também é reconhecida uma única conexão de Blob com prefixo personalizado (por exemplo, `ROSA_BLOB_READ_WRITE_TOKEN`). Havendo vários tokens sem uma variável padrão, o diagnóstico informa `MULTIPLE_BLOB_BINDINGS`: nesse caso, escolha explicitamente o armazenamento da campanha com `BLOB_READ_WRITE_TOKEN`. O diagnóstico mostra somente nomes das variáveis e o identificador do commit do deploy, nunca valores de credenciais.
+
 ## Conteúdo e arte
 
 Perguntas e respostas estão em `src/main.js`. Imagens derivadas do PDF enviado estão em `public/assets/`. O conteúdo educativo foi transcrito do modelo fornecido, incluindo as faixas etárias; não foi feita revisão clínica independente. Antes de exposição pública, o responsável pela campanha deve revisar o conteúdo e os direitos de uso das imagens. Os arquivos separados mencionados ainda não foram recebidos.

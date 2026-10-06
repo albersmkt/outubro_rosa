@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { resolveBlobCredentials } from './blob-credentials.js';
 
 export const PHOTO_TTL_MS = 15 * 60 * 1000;
 export const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
@@ -6,12 +7,7 @@ const PREFIX = 'outubro-rosa-selfies/';
 const VALID_ID = /^(\d{13})-([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/;
 
 function existingCredentials() {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
-  // Current Vercel Blob SDK also supports the platform's OIDC authentication.
-  if (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN) {
-    return { storeId: process.env.BLOB_STORE_ID, oidcToken: process.env.VERCEL_OIDC_TOKEN };
-  }
-  return null;
+  return resolveBlobCredentials().credentials;
 }
 
 export function createSelfieHandler({ storage, token = existingCredentials, now = Date.now, uuid = randomUUID }) {
@@ -46,7 +42,8 @@ export function createSelfieHandler({ storage, token = existingCredentials, now 
     }
     const url = new URL(req.url, 'https://selfie.local');
     if (req.method === 'GET' && url.searchParams.get('status') === '1') {
-      return json(res, 200, { configured: Boolean(auth), authentication: typeof auth === 'string' ? 'token' : auth ? 'oidc' : 'missing', required: 'Private Vercel Blob connected to this deployment' });
+      const binding = token === existingCredentials ? resolveBlobCredentials() : null;
+      return json(res, 200, { configured: Boolean(auth), authentication: typeof auth === 'string' ? 'token' : auth ? 'oidc' : 'missing', credentialVariable: binding?.variable ?? null, issue: binding?.issue ?? null, candidateNames: binding?.candidateNames ?? [], deploymentCommit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null, required: 'Private Vercel Blob connected to this deployment' });
     }
     if (!auth) return json(res, 503, { code: 'STORAGE_NOT_CONFIGURED', error: 'Conecte um Vercel Blob privado ao projeto.' });
     try {
