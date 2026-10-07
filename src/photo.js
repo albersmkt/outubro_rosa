@@ -51,11 +51,14 @@ export async function createCampaignPhoto(video) {
   ctx.font = '400 26px Poppins';
   ctx.fillStyle = '#ffe5ed';
   ctx.fillText('Um momento de carinho com você.', 540, 1795);
-  ctx.drawImage(senac, 70, 1810, 156, 156 * senac.naturalHeight / senac.naturalWidth);
+  const brandBaseline = 1905;
+  const senacHeight = 156 * senac.naturalHeight / senac.naturalWidth;
+  const inovacaoHeight = 224 * 380 / 1420;
+  ctx.drawImage(senac, 70, brandBaseline - senacHeight, 156, senacHeight);
   ctx.save();
   // Blend the supplied white artwork's black background into the pink frame.
   ctx.globalCompositeOperation = 'screen';
-  ctx.drawImage(inovacao, 786, 1845, 224, 224 * 380 / 1420);
+  ctx.drawImage(inovacao, 786, brandBaseline - inovacaoHeight, 224, inovacaoHeight);
   ctx.restore();
   return new Promise((resolve, reject) => canvas.toBlob(blob => {
     if (blob) resolve(blob);
