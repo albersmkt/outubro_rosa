@@ -55,7 +55,7 @@ export async function createCampaignPhoto(video) {
   ctx.save();
   // Blend the supplied white artwork's black background into the pink frame.
   ctx.globalCompositeOperation = 'screen';
-  ctx.drawImage(inovacao, 235, 1830, 280, 280 * 380 / 1420);
+  ctx.drawImage(inovacao, 730, 1830, 280, 280 * 380 / 1420);
   ctx.restore();
   return new Promise((resolve, reject) => canvas.toBlob(blob => {
     if (blob) resolve(blob);
