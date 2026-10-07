@@ -7,7 +7,11 @@ export async function createCampaignPhoto(video) {
   snapshot.getContext('2d').drawImage(video, 0, 0);
   const background = new Image();
   background.src = '/assets/perguntas.png';
-  await background.decode();
+  const senac = new Image();
+  senac.src = '/assets/senac-logo.png';
+  const inovacao = new Image();
+  inovacao.src = '/assets/inovacao-lockup.svg';
+  await Promise.all([background.decode(), senac.decode(), inovacao.decode()]);
   await document.fonts.load('700 64px Poppins');
   await document.fonts.load('400 32px Poppins');
 
@@ -46,7 +50,13 @@ export async function createCampaignPhoto(video) {
   ctx.fillText('INFORMAÇÃO TAMBÉM É PREVENÇÃO.', 540, 1750);
   ctx.font = '400 26px Poppins';
   ctx.fillStyle = '#ffe5ed';
-  ctx.fillText('Um momento de carinho com você.', 540, 1810);
+  ctx.fillText('Um momento de carinho com você.', 540, 1795);
+  ctx.drawImage(senac, 70, 1830, 130, 130 * senac.naturalHeight / senac.naturalWidth);
+  ctx.save();
+  // Blend the supplied white artwork's black background into the pink frame.
+  ctx.globalCompositeOperation = 'screen';
+  ctx.drawImage(inovacao, 235, 1830, 280, 280 * 380 / 1420);
+  ctx.restore();
   return new Promise((resolve, reject) => canvas.toBlob(blob => {
     if (blob) resolve(blob);
     else reject(new Error('Não foi possível preparar a foto.'));
